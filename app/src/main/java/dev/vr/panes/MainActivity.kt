@@ -348,6 +348,8 @@ class MainActivity : Activity(), Video.Listener {
     private fun switchTo(i: Int) {
         val cam = cams.getOrNull(i) ?: return
         current = i; lastSwitch = System.currentTimeMillis()
+        // The details card belongs to the camera it was opened on.
+        if (detailOn) showDetail(false)
         place?.let { repo.rememberCam(it.name, cam.id) }
         onAudio(cam, has = false)
         tickClock()
@@ -449,6 +451,8 @@ class MainActivity : Activity(), Video.Listener {
         scrim.fadeTo(if (browsing) 1f else if (bare || windowed) 0f else .85f, d).start()
         if (bare && !windowed) { ui.removeCallbacks(timeout); hideInfo.run() }
         if (!actionsOpen) clock.fadeTo(if (clockOverPlayer) 0f else 1f, d).start()
+        // Nothing may sit over a visible YouTube player, so a card opened before it started comes down.
+        if (detailOn && video.youtube && video.playing && !repo.hideYt) showDetail(false)
     }
 
     /** YouTube forbids anything in front of its player, so outside a personal build the clock steps aside while one plays. */
