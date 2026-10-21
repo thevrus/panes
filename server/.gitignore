@@ -1,0 +1,7 @@
+node_modules/
+.wrangler/
+.dev.vars*
+.env*
+src/catalog.generated.json
+worker-configuration.d.ts
+dist/

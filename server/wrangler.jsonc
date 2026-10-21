@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "panes-cams",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "observability": { "enabled": true },
+  // Create with: bunx wrangler kv namespace create CAMS   (then paste the id here)
+  "kv_namespaces": [{ "binding": "CAMS", "id": "09d64ee834ee4f7f9093c9b21d4bec62" }],
+  // Daily catalog health check (see README "Cron"). 09:00 UTC = after the PT quota reset.
+  "triggers": { "crons": ["0 9 * * *"] }
+  // Secrets (never here): YOUTUBE_API_KEY, PANES_APP_KEY  -> bunx wrangler secret put <NAME>
+}

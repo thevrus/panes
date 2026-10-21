@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ink"
+    android:clipChildren="false">
+
+    <SurfaceView android:id="@+id/video" android:layout_width="match_parent" android:layout_height="match_parent" />
+    <WebView android:id="@+id/tube" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:visibility="gone" />
+    <dev.vr.panes.Pane android:id="@+id/heroA" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:importantForAccessibility="no" />
+    <dev.vr.panes.Pane android:id="@+id/heroB" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:alpha="0" android:importantForAccessibility="no" />
+    <!-- Behind a windowed (soft) picture only: the blurred frame fills the screen and hides whatever overflows the window. -->
+    <dev.vr.panes.Matte android:id="@+id/matte" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:alpha="0" android:importantForAccessibility="no" />
+    <View android:id="@+id/scrim" android:layout_width="match_parent" android:layout_height="match_parent" />
+
+    <!-- A glass card (set in code), its edge on the 48dp margin like every other piece of glass. -->
+    <LinearLayout android:id="@+id/detail" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:paddingHorizontal="22dp" android:paddingVertical="16dp"
+        android:layout_gravity="top|start" android:layout_marginStart="48dp" android:layout_marginTop="80dp"
+        android:alpha="0" android:orientation="vertical" android:visibility="gone" />
+
+    <!-- The browse bar over the shelf: where the cameras are, and every camera at once. Up from the posters lands here. -->
+    <LinearLayout android:id="@+id/bar" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginStart="48dp" android:layout_marginTop="40dp" android:orientation="horizontal"
+        android:clipChildren="false" android:clipToPadding="false" android:alpha="0">
+        <TextView android:id="@+id/city" style="@style/Action" android:drawableEnd="@drawable/ic_chevron"
+            android:drawablePadding="6dp" android:drawableTint="@color/on_focus_dim" android:fontFamily="@font/geist_semibold"
+            android:textSize="17sp" android:paddingVertical="7dp"
+            android:nextFocusLeft="@id/city" android:nextFocusUp="@id/city" android:nextFocusRight="@+id/browseAll" />
+        <TextView android:id="@+id/browseAll" style="@style/Action" android:drawableStart="@drawable/ic_panes"
+            android:text="All cameras" android:textSize="17sp" android:fontFamily="@font/geist_semibold"
+            android:paddingVertical="7dp" android:layout_marginEnd="0dp" android:focusable="false"
+            android:nextFocusLeft="@id/city" android:nextFocusUp="@id/browseAll" android:nextFocusRight="@+id/browseAll" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="48dp"
+        android:layout_marginBottom="40dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:descendantFocusability="blocksDescendants"
+        android:focusable="true"
+        android:orientation="vertical">
+        <TextView android:id="@+id/title" style="@style/Title.OnPicture" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:maxLines="1" android:ellipsize="end" />
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <TextView android:id="@+id/meta" style="@style/OnPicture" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:maxLines="1" android:ellipsize="end"
+                android:textColor="@color/on_picture_dim" android:textSize="15sp" />
+            <!-- After the text, so it can come and go without moving the line. -->
+            <dev.vr.panes.Spinner android:id="@+id/spinner" android:layout_width="16dp" android:layout_height="16dp"
+                android:layout_marginStart="10dp" android:visibility="gone" />
+        </LinearLayout>
+        <!-- Hint and actions share one fixed-height slot, so swapping them never moves the title. -->
+        <FrameLayout android:layout_width="wrap_content" android:layout_height="52dp"
+            android:clipChildren="false" android:clipToPadding="false">
+            <TextView android:id="@+id/hint" style="@style/OnPicture" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" android:text="Select for options  ·  Down to browse"
+                android:textColor="@color/on_picture_dim" android:textSize="13sp" />
+            <LinearLayout android:id="@+id/actions" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:orientation="horizontal"
+                android:clipChildren="false" android:clipToPadding="false" android:alpha="0" android:visibility="gone">
+            <TextView android:id="@+id/actFav" style="@style/Action" android:drawableStart="@drawable/ic_fav_outline" android:text="Favorite" />
+            <TextView android:id="@+id/actInfo" style="@style/Action" android:drawableStart="@drawable/ic_info" android:text="Info" />
+            <TextView android:id="@+id/actAll" style="@style/Action" android:drawableStart="@drawable/ic_panes" android:text="All cameras" />
+            <TextView android:id="@+id/actLoc" style="@style/Action" android:text="Location" />
+            <TextView android:id="@+id/actSize" style="@style/Action" android:text="Picture size" />
+            <!-- Only for cameras that carry sound; tvOS hides what doesn't apply. -->
+            <TextView android:id="@+id/actSound" style="@style/Action" android:text="Sound" android:visibility="gone" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <dev.vr.panes.Shelf
+        android:id="@+id/shelf"
+        android:layout_width="match_parent"
+        android:layout_height="136dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="30dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:fillViewport="false"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+        <LinearLayout android:id="@+id/row" android:layout_width="wrap_content" android:layout_height="match_parent"
+            android:clipChildren="false" android:clipToPadding="false" android:gravity="center_vertical"
+            android:orientation="horizontal" android:paddingHorizontal="48dp" />
+    </dev.vr.panes.Shelf>
+
+    <!-- Calm, as the tvOS screensaver keeps its clock: the time, and under it the day and the weather on one dim line. -->
+    <LinearLayout android:id="@+id/clock" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="top|end" android:layout_marginTop="40dp" android:layout_marginEnd="48dp"
+        android:gravity="end" android:orientation="vertical">
+        <TextView android:id="@+id/time" style="@style/OnPicture" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:fontFamily="@font/geist_semibold" android:letterSpacing="-0.02" android:textColor="@color/text"
+            android:fontFeatureSettings="tnum"
+            android:textSize="40sp" android:includeFontPadding="false" />
+        <TextView android:id="@+id/date" style="@style/OnPicture" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="6dp" android:textColor="@color/on_picture_dim" android:textSize="16sp" />
+    </LinearLayout>
+
+    <FrameLayout android:id="@+id/grid" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:clickable="true" android:visibility="gone">
+        <!-- A blurred still of whatever was on screen, like tvOS: opaque, so nothing behind ghosts through. -->
+        <ImageView android:id="@+id/gridBg" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:background="@color/ink" android:scaleType="centerCrop" android:importantForAccessibility="no" />
+        <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/veil" />
+        <dev.vr.panes.Wall android:id="@+id/gridScroll" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipChildren="false" android:clipToPadding="false" android:overScrollMode="never"
+            android:paddingTop="44dp" android:paddingBottom="56dp" android:scrollbars="none">
+            <LinearLayout android:id="@+id/gridContent" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:clipChildren="false" android:clipToPadding="false" android:orientation="vertical"
+                android:paddingHorizontal="46dp">
+                <!-- tvOS top tabs: focusing one switches the grid, the open one keeps a quiet platter. -->
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal" android:layout_marginBottom="20dp"
+                    android:clipChildren="false" android:clipToPadding="false" android:orientation="horizontal">
+                    <TextView android:id="@+id/tabAll" style="@style/Tab" android:text="All cameras" />
+                    <TextView android:id="@+id/tabFav" style="@style/Tab" android:text="Favorites" />
+                </LinearLayout>
+                <TextView android:id="@+id/gridTitle" style="@style/Title" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp" />
+                <TextView android:id="@+id/gridCount" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp" android:layout_marginTop="2dp" android:layout_marginBottom="28dp"
+                    android:textColor="@color/text_dim"
+                    android:textSize="16sp" />
+                <!-- Cells carry half the gutter (18dp) on each side, so the content padding is 64dp minus that and the
+                     title steps back in by it: outer cards and title share the 64dp margin. -->
+                <GridLayout android:id="@+id/gridList" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:clipChildren="false" android:clipToPadding="false"
+                    android:columnCount="3" />
+            </LinearLayout>
+        </dev.vr.panes.Wall>
+    </FrameLayout>
+
+    <FrameLayout android:id="@+id/picker" android:layout_width="match_parent" android:layout_height="match_parent"
+        android:alpha="0" android:clickable="true" android:clipChildren="false" android:contentDescription="Location"
+        android:visibility="gone">
+        <ImageView android:id="@+id/pickBg" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:background="@color/ink" android:scaleType="centerCrop" android:importantForAccessibility="no" />
+        <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/veil" />
+        <!-- The tvOS Settings split: what you are choosing on the left, the choices on the right. -->
+        <LinearLayout android:id="@+id/pickCol" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:baselineAligned="false" android:orientation="horizontal"
+            android:paddingStart="64dp" android:paddingEnd="16dp" android:paddingTop="64dp" android:paddingBottom="40dp">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:layout_marginEnd="48dp" android:layout_marginTop="14dp" android:orientation="vertical">
+                <TextView android:id="@+id/pickTitle" style="@style/Title" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Location" />
+                <TextView android:id="@+id/pickNote" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" android:maxWidth="360dp" android:lineSpacingExtra="4sp"
+                    android:text="Cameras near this place come first." android:textColor="@color/text_dim" android:textSize="16sp" />
+            </LinearLayout>
+            <!-- The scroll clips the list to the list's own box, so a scrolled row never slides over the title. That box
+                 must hold the focused row's growth and its whole soft shadow, so the room is padding inside the list
+                 (40dp sides, 28dp ends; rows still end 56dp from the screen edge), not padding on the scroll, where the
+                 clip squared off the row's corners and cut its shadow. The tall fades let rows dissolve. -->
+            <dev.vr.panes.Wall android:id="@+id/pickScroll" android:layout_width="520dp" android:layout_height="match_parent"
+                android:fadingEdgeLength="72dp" android:overScrollMode="never"
+                android:requiresFadingEdge="vertical" android:scrollbars="none">
+                <LinearLayout android:id="@+id/pickList" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:clipChildren="false" android:clipToPadding="false"
+                    android:orientation="vertical" android:paddingHorizontal="40dp" android:paddingVertical="28dp" />
+            </dev.vr.panes.Wall>
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

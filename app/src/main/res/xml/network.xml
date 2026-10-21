@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FL511 video is served from divas.cloud, which chains to Sectigo's 2021 R46 root.
+     Android 11 (SHIELD) predates that root, so trust it for this domain only. -->
+<network-security-config>
+    <domain-config>
+        <domain includeSubdomains="true">divas.cloud</domain>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/sectigo_r46" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

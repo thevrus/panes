@@ -1,0 +1,11 @@
+build/
+.gradle/
+.kotlin/
+local.properties
+.playwright-mcp/
+.claude/
+node_modules/
+
+# personal-use cameras: stay on your own machine and your own Worker deploy
+server/catalog-local.json
+server/LEDGER.md

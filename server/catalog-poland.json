@@ -1,0 +1,39 @@
+[
+ {
+  "id": "yt:aDPx4H6CAXE",
+  "kind": "youtube",
+  "videoId": "aDPx4H6CAXE",
+  "channelId": "UCPQH7Qez-TIVJv5cmquVFyg",
+  "still": "https://i.ytimg.com/vi/aDPx4H6CAXE/maxresdefault_live.jpg",
+  "stillIsFrame": false,
+  "title": "Warsaw skyline and National Stadium",
+  "channel": "Warsaw Livestream",
+  "lat": 52.2396,
+  "lon": 21.0458,
+  "height": 1080,
+  "attribution": "YouTube · Warsaw Livestream",
+  "embeddable": true,
+  "live": true,
+  "checkedAt": "2026-10-19",
+  "clean": false,
+  "follow": true
+ },
+ {
+  "id": "yt:xYOmKmx0mMc",
+  "kind": "youtube",
+  "videoId": "xYOmKmx0mMc",
+  "channelId": "UCM_D7m1EjQTTnd12TSYJebg",
+  "still": "https://i.ytimg.com/vi/xYOmKmx0mMc/maxresdefault_live.jpg",
+  "stillIsFrame": false,
+  "title": "Clifftop promenade, Trzęsacz",
+  "channel": "rewalkamera_pl",
+  "lat": 54.082,
+  "lon": 14.944,
+  "height": 1440,
+  "attribution": "YouTube · rewalkamera_pl",
+  "embeddable": true,
+  "live": true,
+  "checkedAt": "2026-10-19",
+  "clean": false
+ }
+]

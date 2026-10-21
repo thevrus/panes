@@ -1,0 +1,50 @@
+<resources>
+    <style name="Panes" parent="android:Theme.DeviceDefault.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/ink</item>
+        <item name="android:colorBackground">@color/ink</item>
+        <item name="android:fontFamily">@font/geist_medium</item>
+        <item name="android:defaultFocusHighlightEnabled">false</item>
+    </style>
+    <!-- Text laid over live video: a soft, tight shadow straight down keeps it legible on bright skies and water. -->
+    <style name="OnPicture">
+        <item name="android:shadowColor">#73000000</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">10</item>
+    </style>
+    <!-- Screen titles: one size and weight everywhere a screen is named (the camera, the grid, the picker). -->
+    <style name="Title">
+        <item name="android:fontFamily">@font/geist_semibold</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">34sp</item>
+    </style>
+    <style name="Title.OnPicture">
+        <item name="android:shadowColor">#73000000</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">10</item>
+    </style>
+    <style name="Action">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">14dp</item>
+        <!-- Background: glass at rest, the platter under focus (glassy(), in code). -->
+        <item name="android:drawablePadding">7dp</item>
+        <!-- Off, so the text centres on its own glyphs and lines up with the icon beside it. -->
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:drawableTint">@color/on_focus_text</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:paddingVertical">8dp</item>
+        <item name="android:textColor">@color/on_focus_text</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="Tab" parent="Action">
+        <item name="android:background">@drawable/tab</item>
+        <item name="android:paddingHorizontal">20dp</item>
+        <item name="android:paddingVertical">10dp</item>
+        <item name="android:textColor">@color/tab_text</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+</resources>

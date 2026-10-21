@@ -1,0 +1,6 @@
+<resources>
+    <item name="tileImg" type="id" />
+    <item name="tileFav" type="id" />
+    <item name="tileCard" type="id" />
+    <item name="tileSheen" type="id" />
+</resources>

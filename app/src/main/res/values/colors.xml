@@ -1,0 +1,12 @@
+<resources>
+    <color name="ink">#FF0B0B0A</color>
+    <color name="tile">#FF1D1C1A</color>
+    <color name="veil">#B80B0B0A</color>
+    <color name="text">#F2FFFFFF</color>
+    <color name="text_dim">#A3FFFFFF</color>
+    <color name="on_picture_dim">#D1FFFFFF</color>
+    <color name="text_faint">#66FFFFFF</color>
+    <color name="platter">#F5F4F1</color>
+    <color name="on_platter">#FF141412</color>
+    <color name="tab_on">#26FFFFFF</color>
+</resources>
