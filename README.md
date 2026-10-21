@@ -27,7 +27,7 @@ It is built like a first-party TV app: the picture is the interface, focus is th
 | **100+ curated cameras** | Many at 1080p, some at 4K. Dead feeds drop out on their own |
 | **Ranked, not listed** | Clean views first, then resolution, then distance from you |
 | **Near you** | Cameras within 120 km of the city you pick, plus live YouTube search |
-| **Light on the TV** | One Activity, Media3 for HLS, no UI framework. Smooth on a Shield |
+| **Light on the TV** | One Activity, Media3 for HLS, no UI framework. Smooth on modest TV hardware |
 | **A real screensaver** | Clock and weather over the picture, like Aerial |
 
 ## Screens
@@ -95,7 +95,7 @@ Then `bun run deploy`. HLS entries are served only with `licensed: true`, and th
 
 ## Under the hood
 
-- [`app/`](app) Kotlin, one Activity, `minSdk 28`, built for the NVIDIA Shield (Android 11)
+- [`app/`](app) Kotlin, one Activity, `minSdk 28`, Android TV, API 28 and up
 - [`server/`](server) Hono-style Worker, Zod mini, Vitest. See [server/README.md](server/README.md)
 - [`CLAUDE.md`](CLAUDE.md) the product, design and licensing rules the code follows
 
