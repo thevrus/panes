@@ -1,73 +1,109 @@
 <h1 align="center">Panes</h1>
 
 <p align="center">
-  Live cameras as ambient TV for Android TV.<br>
-  Beaches, skylines, harbours and piers, full screen, with a screensaver to match.
+  Live cameras as ambient TV.<br>
+  Beaches, harbours and skylines, full screen, nothing in the way.
 </p>
 
 <p align="center">
-  <img alt="Android TV" src="https://img.shields.io/badge/Android%20TV-API%2028%2B-3ddc84?style=flat-square">
-  <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-app-7f52ff?style=flat-square">
-  <img alt="Cloudflare Workers" src="https://img.shields.io/badge/Cloudflare-Worker-f38020?style=flat-square">
-  <img alt="Private" src="https://img.shields.io/badge/repo-private-555?style=flat-square">
+  <a href="#run-it-yourself">Run it</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#add-a-camera">Add a camera</a> ·
+  <a href="LICENSE">License</a>
 </p>
 
-## What it does
+<p align="center">
+  <img alt="Downtown West Palm Beach full screen, with clock and weather" src="docs/ambient.jpg" width="900">
+</p>
 
-- **Scenic cameras** from a small Cloudflare Worker: a hand-curated catalog plus YouTube live search, ranked by quality and distance from the city you pick.
-- **Road cameras** from FL511 as a fallback.
-- **Remote first.** One Activity, D-pad only. Media3 plays HLS, the YouTube IFrame player plays YouTube.
-- Built for the NVIDIA Shield (Android 11). Personal use.
+---
 
-## Layout
+Panes is an Android TV app and a small Cloudflare Worker. Pick a city and it puts the best live camera near you on screen, then gets out of the way. Leave it on, or let it run as the screensaver.
 
-| Path | What |
+It is built like a first-party TV app: the picture is the interface, focus is the cursor, and everything works with a D-pad. No typing, no menus you have to think about.
+
+|  |  |
 |---|---|
-| `app/` | Android TV app, Kotlin, package `dev.vr.panes` |
-| `server/` | `panes-cams` Worker serving `GET /v1/cams?lat&lon`. See [server/README.md](server/README.md) |
-| `server/catalog-*.json` | Curated cameras, grouped by region |
-| `CLAUDE.md` | Product, design and licensing rules |
+| **100+ curated cameras** | Many at 1080p, some at 4K. Dead feeds drop out on their own |
+| **Ranked, not listed** | Clean views first, then resolution, then distance from you |
+| **Near you** | Cameras within 120 km of the city you pick, plus live YouTube search |
+| **Light on the TV** | One Activity, Media3 for HLS, no UI framework. Smooth on a Shield |
+| **A real screensaver** | Clock and weather over the picture, like Aerial |
 
-## Build and install
+## Screens
 
-Copy `local.properties` settings (it is gitignored):
+<p align="center">
+  <img alt="Shelf of nearby cameras over the live picture" src="docs/shelf.jpg" width="440">
+  <img alt="All cameras grid for West Palm Beach" src="docs/browse.jpg" width="440">
+</p>
 
-```properties
-sdk.dir=/path/to/Android/sdk
-panes.server=https://<your-worker>.workers.dev   # empty: road cams only
-panes.personal=false                              # true: owner's build, see CLAUDE.md
+Down opens the shelf, Select on All cameras opens the grid, Back always goes up one level.
+
+## How it works
+
+```mermaid
+flowchart LR
+  TV["Android TV app"] -- "GET /v1/cams?lat&lon" --> W["Cloudflare Worker"]
+  W --> C["curated catalog"]
+  W --> Y["YouTube live search"]
+  W --> K[("KV cache, 12 h")]
+  TV -- "HLS" --> S["camera streams"]
+  TV -- "IFrame player" --> YT["YouTube"]
 ```
 
+The TV never talks to the YouTube API. The Worker holds the key, caps searches at 90 a day, caches each half-degree cell, and falls back to the last good answer. The app plays HLS with Media3 and YouTube through the official IFrame player. Panes never downloads or re-hosts video: every stream stays with its owner.
 
-```sh
-./gradlew :app:compileReleaseKotlin   # type-check
-./gradlew assembleRelease             # build the APK
-adb install -r app/build/outputs/apk/release/app-release.apk
-```
+## Run it yourself
 
-## Worker
+You need Android Studio's SDK, [Bun](https://bun.sh), and a Cloudflare account.
+
+**1. Deploy the Worker**
 
 ```sh
 cd server
 bun install
-bun run test
+bunx wrangler kv namespace create CAMS      # paste the id into wrangler.jsonc
+bunx wrangler secret put YOUTUBE_API_KEY    # optional: without it, catalog only
 bun run deploy
 ```
 
-Secrets (`YOUTUBE_API_KEY`, optional `PANES_APP_KEY`) go in with `bunx wrangler secret put`. Never commit them.
+**2. Build the app**
 
-## Adding a camera
+Create `local.properties` (gitignored):
 
-1. Add an entry to the right `server/catalog-<region>.json`: `lat`, `lon`, `title`, plus `videoId` for YouTube or `url` for HLS.
-2. `bun run catalog`, then deploy.
+```properties
+sdk.dir=/path/to/Android/sdk
+panes.server=https://<your-worker>.workers.dev
+```
 
-HLS entries are served only with `licensed: true`, and this repo ships none. Streams whose owners allow personal viewing but not redistribution (local TV station cams, beach-cam networks) go in `server/catalog-local.json`, which is gitignored; copy [server/examples/catalog-local.example.json](server/examples/catalog-local.example.json). Check each owner's terms yourself: you are responsible for what you add.
+```sh
+./gradlew assembleRelease
+adb install -r app/build/outputs/apk/release/app-release.apk
+```
+
+Leave `panes.server` empty and the app shows road cameras only.
+
+## Add a camera
+
+Add an entry to the right `server/catalog-<region>.json`:
+
+```json
+{ "kind": "youtube", "videoId": "...", "title": "Harbour", "lat": 0, "lon": 0, "height": 1080 }
+```
+
+Then `bun run deploy`. HLS entries are served only with `licensed: true`, and this repo ships none. Streams whose owners allow personal viewing but not redistribution go in `server/catalog-local.json`, which is gitignored. Start from [the example](server/examples/catalog-local.example.json), and check each owner's terms yourself.
+
+## Under the hood
+
+- [`app/`](app) Kotlin, one Activity, `minSdk 28`, built for the NVIDIA Shield (Android 11)
+- [`server/`](server) Hono-style Worker, Zod mini, Vitest. See [server/README.md](server/README.md)
+- [`CLAUDE.md`](CLAUDE.md) the product, design and licensing rules the code follows
+
+## Good to know
+
+- FL511 road cameras need a scoped Sectigo R46 trust anchor on Android 11. The app bundles it for one host only. Don't "fix" it by trusting all certificates.
+- Behind a VPN your TV's IP geolocates elsewhere. Pick the city by hand.
 
 ## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE). Personal and other noncommercial use is fine; commercial use is not. Source-available, not OSI open source.
-
-## Notes
-
-- FL511 video needs a scoped Sectigo R46 trust anchor on Android 11. Don't trust all certs.
-- Behind a VPN the TV's IP geolocates elsewhere, so pick the city manually.
+[PolyForm Noncommercial 1.0.0](LICENSE). Personal and other noncommercial use is welcome. Commercial use is not. Source-available, not OSI open source.
