@@ -35,6 +35,11 @@ class Repo(ctx: Context) {
         get() = prefs.getBoolean("sound", false)
         set(v) = prefs.edit().putBoolean("sound", v).apply()
 
+    /** Keep YouTube's own title and logo out of sight: the poster stays up for 5 s and the clock stays on. Personal builds only. */
+    var hideYt: Boolean
+        get() = BuildConfig.PERSONAL && prefs.getBoolean("hideYt", true)
+        set(v) = prefs.edit().putBoolean("hideYt", v).apply()
+
     /** One-time hints: whether the viewer has already done [k]. */
     fun seen(k: String) = prefs.getBoolean("seen$k", false)
     fun see(k: String) { if (!seen(k)) prefs.edit().putBoolean("seen$k", true).apply() }

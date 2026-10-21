@@ -76,6 +76,8 @@
             <TextView android:id="@+id/actSize" style="@style/Action" android:text="Picture size" />
             <!-- Only for cameras that carry sound; tvOS hides what doesn't apply. -->
             <TextView android:id="@+id/actSound" style="@style/Action" android:text="Sound" android:visibility="gone" />
+            <!-- Personal builds only, and only while YouTube plays. -->
+            <TextView android:id="@+id/actYt" style="@style/Action" android:text="YouTube elements" android:visibility="gone" />
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

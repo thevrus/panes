@@ -38,6 +38,9 @@ class Tube(private val web: WebView, private val onLive: () -> Unit, private val
     /** Whether the player may be heard: only once revealed, so nothing ever sounds from behind the poster. */
     private var sound = false
 
+    /** Hold the poster over the player until YouTube's title and logo have faded. Off outside personal builds. */
+    var holdPoster = false
+
     fun sound(on: Boolean) {
         if (on == sound) return
         sound = on
@@ -114,7 +117,7 @@ class Tube(private val web: WebView, private val onLive: () -> Unit, private val
             when (s) {
                 1 -> {
                     ui.removeCallbacks(hide); since = now
-                    if (!live) { ui.removeCallbacks(reveal); ui.postDelayed(reveal, if (BuildConfig.PERSONAL) maxOf(0L, 5_000 - played) else 0L) }
+                    if (!live) { ui.removeCallbacks(reveal); ui.postDelayed(reveal, if (holdPoster) maxOf(0L, 5_000 - played) else 0L) }
                 }
                 // A channel's stream ending is its daily restart, not a dead camera: the next play opens the new one.
                 0 -> { ui.removeCallbacks(reveal); ui.removeCallbacks(hide); live = false; onLost(!channel(id)) }

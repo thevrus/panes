@@ -92,6 +92,7 @@ class MainActivity : Activity(), Video.Listener {
     private lateinit var actFav: TextView
     private lateinit var actSize: TextView
     private lateinit var actSound: TextView
+    private lateinit var actYt: TextView
     private lateinit var detail: LinearLayout
     private val hint by lazy { findViewById<View>(R.id.hint) }
     private val spinner by lazy { findViewById<View>(R.id.spinner) }
@@ -136,6 +137,9 @@ class MainActivity : Activity(), Video.Listener {
         actAll = findViewById<View>(R.id.actAll).apply { setOnClickListener { openGrid() } }
         actSize = findViewById(R.id.actSize)
         actSize.setOnClickListener { repo.size = (repo.size + 1) % SIZES.size; describe(); cams.getOrNull(current)?.let { frame(it) }; touch() }
+        actYt = findViewById(R.id.actYt)
+        video.hideYt = repo.hideYt
+        actYt.setOnClickListener { repo.hideYt = !repo.hideYt; video.hideYt = repo.hideYt; chrome(); rows(); touch() }
         actSound = findViewById(R.id.actSound)
         actSound.setOnClickListener { repo.sound = !repo.sound; video.sound = repo.sound; describe(); touch() }
         video.sound = repo.sound
@@ -144,9 +148,9 @@ class MainActivity : Activity(), Video.Listener {
         browseAll = findViewById(R.id.browseAll)
         browseAll.setOnClickListener { openGrid() }
         listOf(actLoc, city).forEach { b -> b.setOnClickListener { pickOpener = b; openPicker() } }
-        val controls = listOf(actFav, actInfo, actAll, actLoc, actSize, actSound, city, browseAll)
+        val controls = listOf(actFav, actInfo, actAll, actLoc, actSize, actSound, actYt, city, browseAll)
         controls.forEach { b ->
-            b.setOnFocusChangeListener { v, has -> lift(v, has, 1.06f); if (v === actSize || v === actSound || v === actLoc) rows() }
+            b.setOnFocusChangeListener { v, has -> lift(v, has, 1.06f); if (v === actSize || v === actSound || v === actYt || v === actLoc) rows() }
             b.setOnKeyListener { v, code, e ->
                 // The bar's buttons sit over the posters: Down goes back to the one on screen (Left, Right and Up are in the layout).
                 if (press(v, e, 1.06f)) true
@@ -436,17 +440,17 @@ class MainActivity : Activity(), Video.Listener {
     /**
      * YouTube forbids drawing over its player: while one is live in ambient, the scrim goes and, unless the player is
      * windowed (the title then sits beside it, on the matte), so does the title. The matte is scrim enough for a window.
-     * The clock stays up over the player only in a personal build (`panes.personal=true`, see README); otherwise it steps aside.
+     * The clock stays up over the player only while the personal-build "YouTube elements" row says Hidden; otherwise it steps aside.
      */
     private fun chrome(d: Long = 380) {
         val bare = video.youtube && video.playing && !browsing && !actionsOpen
         scrim.fadeTo(if (browsing) 1f else if (bare || windowed) 0f else .85f, d).start()
         if (bare && !windowed) { ui.removeCallbacks(timeout); hideInfo.run() }
-        if (!actionsOpen && !BuildConfig.PERSONAL) clock.fadeTo(if (clockOverPlayer) 0f else 1f, d).start()
+        if (!actionsOpen) clock.fadeTo(if (clockOverPlayer) 0f else 1f, d).start()
     }
 
     /** YouTube forbids anything in front of its player, so outside a personal build the clock steps aside while one plays. */
-    private val clockOverPlayer get() = !BuildConfig.PERSONAL && video.youtube && video.playing && !windowed
+    private val clockOverPlayer get() = !repo.hideYt && video.youtube && video.playing && !windowed
 
     private fun loadPoster(i: Int, crossfade: Boolean) {
         val cam = cams.getOrNull(i) ?: return
@@ -668,6 +672,9 @@ class MainActivity : Activity(), Video.Listener {
         row(actLoc, "Location", place?.name ?: repo.city ?: "Automatic")
         row(actSize, "Picture size", SIZES[repo.size])
         row(actSound, "Sound", if (repo.sound) "On" else "Off")
+        // Only personal builds may keep YouTube's own elements out of sight, and only while YouTube is what plays.
+        actYt.visibility = if (BuildConfig.PERSONAL && video.youtube) View.VISIBLE else View.GONE
+        row(actYt, "YouTube elements", if (repo.hideYt) "Hidden" else "Shown")
     }
 
     /** The Sound row only exists for a camera that can be heard; focus never stays on a row that goes. */

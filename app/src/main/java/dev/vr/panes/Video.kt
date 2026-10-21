@@ -103,6 +103,9 @@ class Video(ctx: Context, private val surface: SurfaceView, web: WebView, privat
     /** The viewer wants sound. Takes effect only while a stream with audio plays, and never from behind a poster. */
     var sound = false
         set(v) { field = v; yielded = false; hear() }
+    var hideYt: Boolean
+        get() = tube.holdPoster
+        set(v) { tube.holdPoster = v }
     private val tube = Tube(web,
         onLive = { cam?.let { started = true; ui.removeCallbacks(tooSlow); listener.onLive(it); hear() } },
         onLost = { dead -> cam?.let { lost(it, dead) } },
