@@ -34,7 +34,13 @@
         <TextView android:id="@+id/browseAll" style="@style/Action" android:drawableStart="@drawable/ic_panes"
             android:text="All cameras" android:textSize="17sp" android:fontFamily="@font/geist_semibold"
             android:paddingVertical="7dp" android:layout_marginEnd="0dp" android:focusable="false"
-            android:nextFocusLeft="@id/city" android:nextFocusUp="@id/browseAll" android:nextFocusRight="@+id/browseAll" />
+            android:nextFocusLeft="@id/city" android:nextFocusUp="@id/browseAll" android:nextFocusRight="@+id/bYt" />
+        <!-- Personal builds only: whether YouTube's own title and logo are kept out of sight. -->
+        <TextView android:id="@+id/bYt" style="@style/Action" android:text="YouTube"
+            android:textSize="17sp" android:fontFamily="@font/geist_semibold"
+            android:paddingVertical="7dp" android:layout_marginStart="14dp" android:layout_marginEnd="0dp" android:focusable="false"
+            android:visibility="gone"
+            android:nextFocusLeft="@id/browseAll" android:nextFocusUp="@id/bYt" android:nextFocusRight="@id/bYt" />
     </LinearLayout>
 
     <LinearLayout
@@ -76,8 +82,6 @@
             <TextView android:id="@+id/actSize" style="@style/Action" android:text="Picture size" />
             <!-- Only for cameras that carry sound; tvOS hides what doesn't apply. -->
             <TextView android:id="@+id/actSound" style="@style/Action" android:text="Sound" android:visibility="gone" />
-            <!-- Personal builds only, and only while YouTube plays. -->
-            <TextView android:id="@+id/actYt" style="@style/Action" android:text="YouTube elements" android:visibility="gone" />
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

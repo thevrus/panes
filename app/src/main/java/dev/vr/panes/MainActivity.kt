@@ -72,7 +72,7 @@ class MainActivity : Activity(), Video.Listener {
         set(v) {
             field = v
             val acts = actions as ViewGroup
-            (listOf(city, browseAll, detail) + List(acts.childCount) { acts.getChildAt(it) }).forEach { it.invalidate() }
+            (listOf(city, browseAll, bYt, detail) + List(acts.childCount) { acts.getChildAt(it) }).forEach { it.invalidate() }
         }
     private lateinit var city: TextView
     private lateinit var browseAll: TextView
@@ -92,7 +92,8 @@ class MainActivity : Activity(), Video.Listener {
     private lateinit var actFav: TextView
     private lateinit var actSize: TextView
     private lateinit var actSound: TextView
-    private lateinit var actYt: TextView
+    private lateinit var bYt: TextView
+    private lateinit var actInfo: View
     private lateinit var detail: LinearLayout
     private val hint by lazy { findViewById<View>(R.id.hint) }
     private val spinner by lazy { findViewById<View>(R.id.spinner) }
@@ -133,13 +134,14 @@ class MainActivity : Activity(), Video.Listener {
         clock = findViewById(R.id.clock); actions = findViewById(R.id.actions)
         actFav = findViewById(R.id.actFav); detail = findViewById(R.id.detail)
         actFav.setOnClickListener { toggleFavorite(current) }
-        val actInfo = findViewById<View>(R.id.actInfo).apply { setOnClickListener { toggleDetail() } }
+        actInfo = findViewById<View>(R.id.actInfo).apply { setOnClickListener { toggleDetail() } }
         actAll = findViewById<View>(R.id.actAll).apply { setOnClickListener { openGrid() } }
         actSize = findViewById(R.id.actSize)
         actSize.setOnClickListener { repo.size = (repo.size + 1) % SIZES.size; describe(); cams.getOrNull(current)?.let { frame(it) }; touch() }
-        actYt = findViewById(R.id.actYt)
+        bYt = findViewById(R.id.bYt)
+        bYt.visibility = if (BuildConfig.PERSONAL) View.VISIBLE else View.GONE
         video.hideYt = repo.hideYt
-        actYt.setOnClickListener { repo.hideYt = !repo.hideYt; video.hideYt = repo.hideYt; chrome(); rows(); touch() }
+        bYt.setOnClickListener { repo.hideYt = !repo.hideYt; video.hideYt = repo.hideYt; chrome(); rows(); touch() }
         actSound = findViewById(R.id.actSound)
         actSound.setOnClickListener { repo.sound = !repo.sound; video.sound = repo.sound; describe(); touch() }
         video.sound = repo.sound
@@ -148,13 +150,13 @@ class MainActivity : Activity(), Video.Listener {
         browseAll = findViewById(R.id.browseAll)
         browseAll.setOnClickListener { openGrid() }
         listOf(actLoc, city).forEach { b -> b.setOnClickListener { pickOpener = b; openPicker() } }
-        val controls = listOf(actFav, actInfo, actAll, actLoc, actSize, actSound, actYt, city, browseAll)
+        val controls = listOf(actFav, actInfo, actAll, actLoc, actSize, actSound, city, browseAll, bYt)
         controls.forEach { b ->
-            b.setOnFocusChangeListener { v, has -> lift(v, has, 1.06f); if (v === actSize || v === actSound || v === actYt || v === actLoc) rows() }
+            b.setOnFocusChangeListener { v, has -> lift(v, has, 1.06f); if (v === actSize || v === actSound || v === actLoc || v === bYt) rows() }
             b.setOnKeyListener { v, code, e ->
                 // The bar's buttons sit over the posters: Down goes back to the one on screen (Left, Right and Up are in the layout).
                 if (press(v, e, 1.06f)) true
-                else if ((v === city || v === browseAll) && code == KeyEvent.KEYCODE_DPAD_DOWN && e.action == KeyEvent.ACTION_DOWN) { currentTile()?.requestFocus(); true }
+                else if ((v === city || v === browseAll || v === bYt) && code == KeyEvent.KEYCODE_DPAD_DOWN && e.action == KeyEvent.ACTION_DOWN) { currentTile()?.requestFocus(); true }
                 else false
             }
         }
@@ -538,7 +540,7 @@ class MainActivity : Activity(), Video.Listener {
         cams.getOrNull(current)?.let { frame(it) }
         // No cameras, no "All cameras": the bar never offers a button that leads nowhere.
         browseAll.visibility = if (cams.isEmpty()) View.GONE else View.VISIBLE
-        city.isFocusable = on; browseAll.isFocusable = on
+        city.isFocusable = on; browseAll.isFocusable = on; bYt.isFocusable = on
         ui.removeCallbacks(idle)
         if (on) {
             // A shelf of nothing but favorites has no tile to land on; the location label takes focus instead.
@@ -593,7 +595,7 @@ class MainActivity : Activity(), Video.Listener {
     private fun toggleDetail() {
         if (detailOn) { showDetail(false); return }
         // The card sits high on the left, over the picture; a visible YouTube player may never be drawn over.
-        if (video.youtube && video.playing) return
+        if (video.youtube && video.playing && !repo.hideYt) return
         val cam = cams.getOrNull(current) ?: return
         detail.removeAllViews(); showDetail(true)
         // The small spinner, held back a beat so an answer that comes at once never flashes it.
@@ -672,9 +674,10 @@ class MainActivity : Activity(), Video.Listener {
         row(actLoc, "Location", place?.name ?: repo.city ?: "Automatic")
         row(actSize, "Picture size", SIZES[repo.size])
         row(actSound, "Sound", if (repo.sound) "On" else "Off")
-        // Only personal builds may keep YouTube's own elements out of sight, and only while YouTube is what plays.
-        actYt.visibility = if (BuildConfig.PERSONAL && video.youtube) View.VISIBLE else View.GONE
-        row(actYt, "YouTube elements", if (repo.hideYt) "Hidden" else "Shown")
+        row(bYt, "YouTube", if (repo.hideYt) "Hidden" else "Shown")
+        // A card may not be drawn over a visible YouTube player; only the personal "Hidden" mode allows it.
+        val noCard = video.youtube && video.playing && !repo.hideYt
+        actInfo.visibility = if (noCard) View.GONE else View.VISIBLE
     }
 
     /** The Sound row only exists for a camera that can be heard; focus never stays on a row that goes. */
